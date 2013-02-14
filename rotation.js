@@ -1,47 +1,82 @@
-// Main loop consists of the following three steps, repeated until 
-// minutes are over:
-// 1) a minute of a new or continuing song sung (and singing history updated)
-// 2) changes (presumably new entries on the signup list) Note that the signup list can chnange as of step 1
-// 3) the "rotation list" gets recomputed
-
-// There are 2 objects in the state:
-// 1) the history of who sung what sung at what minutes (array of SongItems)
-// 3) the current state of the future rotation (array of SongItems)
-//
-// There are 2 functions that an algorithm "defines" -- they are basically 
-// called once for each minute for the 3 steps above:
-// f1 - modifies the history and rotation (if a new song is sung) - f1 is basically responsible for determining how the "next song" is selected if needed. Thus, it can modify the history and rotation
-// f2 modifies the rotation based on people signing up, dropping out, changes to the rotation
-
-// for each minute, record who is singing, and who signs up and drops out
-
 function SongItem(song, singer) {
 	this.song=song;
 	this.singer=singer;
-	return this;
 }
 
-function HistoryItem(song, signups, dropouts) {
-	this.song=song; // a single songitem (may repeat across minutes)
-	this.signups=signups; // list of songitems
-	this.dropouts=dropouts; // list of singers	
+function HistoryItem() {
+	this.adds=null; // list of songitems
+	this.drops=null; // list of singers	
+	this.newrotation=null; // a flag to indicate top of a new rotation
+	this.currentrotation=null; // a snapshot of the current rotation 
+}
 
 function History() {
-	this.minutes= new Array();
-	this.addMinute(historyitem) {
-		// probably add a convenience where if the historyitem
-		// doesn't have a song, then get the "current" song from 
-		// the last minute
-		this.minutes.push(historyitem);
-	}
+	this.slots= new Array();
+	this.addSlot=function(historyitem) {
+		this.slots.push(historyitem);
+	};
+	this.rewindToSlot=function(slot) {
+		// TODO
+	};
 }
+
 function State() {
-	this.length = minutes;
+	this.slotcount= 0;
 	this.history=new History();
 	this.rotation=new Array();
 }
 
-function mainLoop(minutes, f1, f2) {
+function SingerGenerator() {
+	this.state= null;
+	this.slotcount= 0;
+	this.generateAddDrops=function(slot) {
+		// Returns (adds, drops)
+	};
+}
+
+function RotationAlgorithm() {
+	this.state=null;
+	this.isNewRotation  = function(slot) {
+		// Returns true/false to determine if there's a new rotation
+	}
+	this.updateRotation = function(slot, adds, drops) {
+		// After add/drops list has been collected, update the rotation
+	};
+}
+
+function runCompletely(slotcount, generator, algorithm) {
 	var state=new State();
-	
+	state.slotcount=slotcount;
+	algorithm.state=state;
+	generator.slotcount=slotcount;
+	generator.state=state;
+	var songitem = null;
+	var historyitem = new HistoryItem();
+
+
+	for (slot=0; slot < slotcount; slot++) {
+		console.log("Slot", slot);
+		var nextad = generator.generateAddDrops(slot);
+		var adds=nextad[0];
+		var drops=nextad[1];
+		historyitem.adds=adds;
+		historyitem.drops=drops;
+		if(algorithm.isNewRotation(slot)) {
+			// Update the rotation # and log this 
+			// XXX: Stopped here
+			historyitem.newrotation=true;
+		}
+		else { 
+			historyitem.newrotation=false;
+		}
+		
+		algorithm.updateRotation(slot, adds, drops); 
+		historyitem.currentrotation=state.rotation.slice();
+		// XXX ensure songitem to get from rotation then get it
+		var songitem=state.rotation.pop(); // sing this song! 
+		// XXX log songitem somewhere
+		console.log("Adding history item",historyitem);	
+		state.history.addSlot(historyitem);
+	}		
+	return state; 
 }

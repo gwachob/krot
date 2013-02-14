@@ -1,8 +1,34 @@
 <head>
-<script src="jquery.js"></script>
+<script src="resources/jquery.js"></script>
 <script src="rotation.js"></script>
 </head>
 <body>
+<div id="input">
+<p><strong>Slots</strong><input id="slotcount"></p>
+<p><a href="" id="submit">Submit</a></p>
+<script>
+$(function() {	
+	$("#submit").click(
+		function(e) {
+			var slotcount=$("#slotcount").val();
+			console.log(slotcount);
+			var sg=new SingerGenerator(); 
+			var ra=new RotationAlgorithm();
+			sg.generateAddDrops=function(slot) {
+				return [
+					[new SongItem("song"+slot, "singer"+slot)], []];
+			}
+			ra.isNewRotation=function(slot) { return false; }
+			ra.updateRotation=function(slot, adds, drops) {
+				this.state.rotation=this.state.rotation.concat(adds);
+			}
+			var resultstate=runCompletely(slotcount, sg, ra);
+			console.log(resultstate, resultstate.history.slots);
+			e.stopPropagation();
+		});
+});
+</script>
+</div>
 <div id="output">
 </div>
 </body>
