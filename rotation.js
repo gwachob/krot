@@ -22,6 +22,8 @@ function History() {
 
 function State() {
 	this.slotcount= 0;
+	this.rotationnumber=1;
+	this.singers=new Object();
 	this.history=new History();
 	this.rotation=new Array();
 }
@@ -64,16 +66,23 @@ function runCompletely(slotcount, generator, algorithm) {
 		if(algorithm.isNewRotation(slot)) {
 			// Update the rotation # and log this 
 			// XXX: Stopped here
+			state.rotationnumber=state.rotationnumber+1;
 			historyitem.newrotation=true;
 		}
 		else { 
 			historyitem.newrotation=false;
 		}
-		
 		algorithm.updateRotation(slot, adds, drops); 
 		historyitem.currentrotation=state.rotation.slice();
+
 		// XXX ensure songitem to get from rotation then get it
 		var songitem=state.rotation.pop(); // sing this song! 
+		console.log("Singer list", state.singers, songitem.singer);
+		if (! (songitem.singer in state.singers)) {
+			console.log("New singer in rotation", songitem.singer, state.rotationnumber);
+			state.singers[songitem.singer]=state.rotationnumber;
+		}
+		$("#output").append("<br>"+songitem.song +"/"+songitem.singer);
 		// XXX log songitem somewhere
 		console.log("Adding history item",historyitem);	
 		state.history.addSlot(historyitem);

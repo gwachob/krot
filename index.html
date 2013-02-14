@@ -16,7 +16,7 @@ $(function() {
 			var ra=new RotationAlgorithm();
 			sg.generateAddDrops=function(slot) {
 				return [
-					[new SongItem("song"+slot, "singer"+slot)], []];
+					[new SongItem(slot, slot % 25)], []];
 			}
 			ra.isNewRotation=function(slot) { return false; }
 			ra.updateRotation=function(slot, adds, drops) {
