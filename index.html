@@ -18,7 +18,18 @@ $(function() {
 				return [
 					[new SongItem(slot, slot % 25)], []];
 			}
-			ra.isNewRotation=function(slot) { return false; }
+			ra.isNewRotation=function(slot) { 
+				// Logic for determing if there's a new 
+				// rotation goes here
+				// Probably something like
+				// 1st rotation: 15 singers
+				// second rotation: 1 new for each old
+				// 3rd rotation 1 new for each old 1/2 round singer
+				// Use the state.singers obj to find out
+				// which rotation a user is in
+				if (slot == 15) { return true; }
+				return false;
+			}
 			ra.updateRotation=function(slot, adds, drops) {
 				this.state.rotation=this.state.rotation.concat(adds);
 			}
